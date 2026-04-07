@@ -1,7 +1,7 @@
 # SmartQ-Automation-System
 AI-Powered Queue Management System for Public Services.
 # Smart Queue & Waiting Time Automation System
-**Developed by:** Team Innovator (Shivani Pratap Jadhav)
+
 
 ## 📌 Project Overview
 [cite_start]This project addresses the problem of overcrowding in public sectors (Hospitals, Banks, Govt Offices) by providing an AI-driven digital token system with real-time wait-time prediction. [cite: 5, 10, 168]
