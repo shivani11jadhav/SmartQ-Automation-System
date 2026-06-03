@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q-Flow AI - Live Web Sandbox</title>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Premium Slate-Dracula CSS Theme System */
+    :root {
+      --bg: #1e1e2e;
+      --surface: #282a36;
+      --primary: #bd93f9;
+      --secondary: #ff79c6;
+      --text: #f8f8f2;
+      --text-muted: #6272a4;
+      --border: #44475a;
+      --teal: #50fa7b;
+      --orange: #ffb86c;
+      --red: #ff5555;
+      --success-bg: rgba(80, 250, 123, 0.1);
+      --warning-bg: rgba(255, 184, 108, 0.1);
+      --error-bg: rgba(255, 85, 85, 0.1);
+      --primary-glow: rgba(189, 147, 249, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: rgba(40, 42, 54, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      background-color: var(--primary-glow);
+      color: var(--primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 1px solid rgba(189, 147, 249, 0.3);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .device-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background-color: var(--border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      color: var(--text);
+    }
+
+    /* Main Split-Screen Workspace */
+    .workspace {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .panel {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel-left {
+      border-right: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 20px;
+      font-weight: 700;
+      border-left: 4px solid var(--primary);
+      padding-left: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title span {
+      font-size: 12px;
+      font-weight: normal;
+      color: var(--text-muted);
+    }
+
+    /* Cards & Components */
+    .card {
+      background-color: var(--surface);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .card-interactive:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      cursor: pointer;
+    }
+
+    .card-selected {
+      border-color: var(--primary) !important;
+      background-color: rgba(189, 147, 249, 0.05);
+    }
+
+    /* Counter selection list */
+    .counter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .counter-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .counter-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .counter-name {
+      font-weight: bold;
+    }
+
+    .counter-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .counter-status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .status-active {
+      background-color: var(--success-bg);
+      color: var(--teal);
+    }
+
+    .status-closed {
+      background-color: var(--error-bg);
+      color: var(--red);
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: var(--bg);
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn:disabled {
+      background-color: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .btn-outline-danger {
+      background-color: transparent;
+      color: var(--red);
+      border: 1.5px solid var(--red);
+    }
+
+    .btn-outline-danger:hover {
+      background-color: var(--error-bg);
+    }
+
+    .btn-success {
+      background-color: var(--teal);
+      color: var(--bg);
+    }
+
+    .btn-warning {
+      background-color: var(--orange);
+      color: var(--bg);
+    }
+
+    /* Live tracker customer card */
+    .token-gradient-card {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--bg);
+      border: none;
+      text-align: center;
+    }
+
+    .token-title {
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      opacity: 0.8;
+    }
+
+    .token-number {
+      font-size: 48px;
+      font-weight: 900;
+      margin: 8px 0;
+    }
+
+    .token-footer {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      font-size: 13px;
+    }
+
+    .token-footer-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .token-footer-val {
+      font-weight: bold;
+    }
+
+    /* Waiting time circle clock */
+    .wait-clock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    .progress-ring-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .progress-ring {
+      position: absolute;
+      transform: rotate(-90deg);
+    }
+
+    .progress-text {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .progress-val {
+      font-size: 36px;
+      font-weight: 900;
+    }
+
+    .progress-lbl {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* Warning banner */
+    .banner-warning {
+      background-color: var(--warning-bg);
+      color: var(--orange);
+      border: 1px solid rgba(255, 184, 108, 0.3);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    /* Milestone Badges */
+    .grid-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .stat-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-val {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Queue lists admin */
+    .queue-admin-list {
+      max-height: 250px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .queue-admin-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .queue-admin-token {
+      background-color: var(--primary-glow);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    /* Dropdown selection */
+    select {
+      background-color: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    /* Loading overlay */
+    .loader-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(40, 42, 54, 0.7);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Split-screen responsive */
+    @media (max-width: 900px) {
+      .workspace {
+        flex-direction: column;
+      }
+      .panel-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Web Sandbox Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">Q</div>
+      <div class="brand-title">Q-FLOW AI Web Sandbox</div>
+    </div>
+    <div class="device-badge">Mock Device: SHIVANI_DEVICE_ID_101</div>
+  </header>
+
+  <!-- Split Screen Sandbox -->
+  <div class="workspace">
+    
+    <!-- LEFT PANEL: Customer Portal -->
+    <div class="panel panel-left" id="customerPortal">
+      <div class="panel-title">
+        Customer Interface
+        <span id="custSelectedCounterText">Not Connected</span>
+      </div>
+
+      <!-- Customer View State Router -->
+      <div id="customerViewsContainer">
+        <!-- RENDER SCREEN 1: Counter Selection -->
+        <div id="screenSelection" class="counter-list">
+          <div class="card" style="border: none; padding: 0; background: transparent;">
+            <p style="margin-bottom: 16px; font-size: 14px; color: var(--text-muted);">
+              Select a service counter below to issue a ticket and track waiting statistics.
+            </p>
+          </div>
+          <!-- Counter options injected here -->
+          <div id="counterOptionsContainer"></div>
+          
+          <button id="btnGenerateToken" class="btn" style="margin-top: 12px;" disabled onclick="generateTicket()">
+            Generate Queue Token
+          </button>
+        </div>
+
+        <!-- RENDER SCREEN 2: Live Tracker (Hidden by default) -->
+        <div id="screenTracker" style="display: none; flex-direction: column; gap: 20px;">
+          <!-- Banner warning for frozen queue -->
+          <div id="frozenQueueBanner" class="banner-warning" style="display: none;">
+            ⚠️ Queue is currently paused/frozen. Operating counters are offline.
+          </div>
+
+          <!-- Token Status Card -->
+          <div class="card token-gradient-card">
+            <div class="token-title">YOUR TOKEN NUMBER</div>
+            <div class="token-number" id="lblUserToken">#--</div>
+            <div class="token-footer">
+              <div class="token-footer-item">
+                <span>STATUS</span>
+                <span class="token-footer-val" id="lblUserStatus">WAITING</span>
+              </div>
+              <div class="token-footer-item">
+                <span>NOW SERVING</span>
+                <span class="token-footer-val" id="lblNowServingCust">#--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Estimated Waiting Time Indicator -->
+          <div class="card wait-clock">
+            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1.5px; color: var(--text-muted);">
+              LIVE ESTIMATED WAITING TIME
+            </div>
+            
+            <div class="progress-ring-container">
+              <svg width="160" height="160" class="progress-ring">
+                <circle id="progressCircleBg" stroke="#44475a" stroke-width="10" fill="transparent" r="70" cx="80" cy="80"/>
+                <circle id="progressCircle" stroke="#bd93f9" stroke-width="10" fill="transparent" r="70" cx="80" cy="80"
+                        stroke-dasharray="439.8" stroke-dashoffset="439.8"/>
+              </svg>
+              <div class="progress-text">
+                <span class="progress-val" id="lblWaitMinutes">--</span>
+                <span class="progress-lbl" id="lblWaitUnit">MINUTES</span>
+              </div>
+            </div>
+
+            <p style="font-size: 11px; text-align: center; color: var(--text-muted); max-width: 300px;" id="lblWaitDescriptor">
+              Calculated dynamically based on real-time activity metrics.
+            </p>
+          </div>
+
+          <!-- Milestone Badges -->
+          <div class="grid-stats">
+            <div class="stat-box">
+              <span class="stat-val" id="lblPeopleAhead">0</span>
+              <span class="stat-lbl">People Ahead</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-val" id="lblQueuePosition">0</span>
+              <span class="stat-lbl">Queue Position</span>
+            </div>
+          </div>
+
+          <button class="btn btn-outline-danger" onclick="leaveQueue()">
+            Cancel Ticket & Leave Queue
+          </button>
+        </div>
+        
+        <!-- RENDER SCREEN 3: Completed Banner (Hidden by default) -->
+        <div id="screenCompleted" class="card" style="display: none; text-align: center; padding: 40px 20px; flex-direction: column; align-items: center; gap: 16px;">
+          <div style="background-color: var(--success-bg); color: var(--teal); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+            ✓
+          </div>
+          <h3 style="font-size: 22px; font-weight: bold;">Service Completed!</h3>
+          <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5; max-width: 320px;">
+            Your ticket has either been completed or was removed from the active queue. Thank you for using our automated service counter.
+          </p>
+          <button class="btn" style="width: auto; margin-top: 12px; padding-left: 32px; padding-right: 32px;" onclick="resetCustomerPortal()">
+            Back to Counters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Admin Operations panel -->
+    <div class="panel panel-right" id="adminPortal">
+      <div class="panel-title">
+        Admin Control Dashboard
+        <span>Desk Management Console</span>
+      </div>
+
+      <!-- Counter Selector -->
+      <div class="card" style="padding: 16px;">
+        <label for="adminCounterSelect" style="display: block; font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 8px;">
+          SELECT OPERATING COUNTER
+        </label>
+        <select id="adminCounterSelect" onchange="changeAdminCounter(this.value)">
+          <option value="" disabled selected>Select counter to operate...</option>
+        </select>
+      </div>
+
+      <!-- Dashboard active screens -->
+      <div id="adminWorkspace" style="display: none; flex-direction: column; gap: 20px; position: relative;">
+        <!-- Card Loader overlay -->
+        <div id="adminLoader" class="loader-overlay" style="display: none;">
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Session Monitor card -->
+        <div class="card" style="text-align: center; border-color: rgba(80, 250, 123, 0.2);" id="activeSessionCard">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; color: var(--text-muted);">
+            <span>CURRENTLY SERVING</span>
+            <span id="lblActiveSessionBadge" style="background-color: var(--success-bg); color: var(--teal); padding: 2px 8px; border-radius: 10px; font-size: 9px; display: none;">ACTIVE SESSION</span>
+          </div>
+          <div style="padding: 24px 0;">
+            <div id="lblAdminServingToken" style="font-size: 48px; font-weight: 900; color: var(--text);">--</div>
+            <div id="lblAdminServingUser" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Desk Idle - Waiting to call client</div>
+          </div>
+        </div>
+
+        <!-- Upcoming Queue Grid -->
+        <div class="card" style="flex: 1; display: flex; flex-direction: column; gap: 12px; min-height: 250px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; color: var(--text-muted);">
+            <span>UPCOMING QUEUE LINE</span>
+            <span id="lblAdminQueueCount" style="background-color: var(--border); color: var(--text); padding: 2px 8px; border-radius: 10px;">0 Waiting</span>
+          </div>
+          
+          <div id="adminQueueContainer" class="queue-admin-list">
+            <!-- Items injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Control Action Panel -->
+        <div style="display: flex; gap: 16px;">
+          <button id="btnAdminComplete" class="btn btn-outline-danger" style="flex: 1;" disabled onclick="adminCompleteTask()">
+            Complete Task
+          </button>
+          <button id="btnAdminCall" class="btn btn-success" style="flex: 1;" disabled onclick="adminCallNext()">
+            Call Next Client
+          </button>
+        </div>
+      </div>
+
+      <!-- Selector prompt state -->
+      <div id="adminSelectionPrompt" class="card" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; color: var(--text-muted); text-align: center; border-style: dashed;">
+        <div>
+          <span style="font-size: 48px; display: block; margin-bottom: 12px;">⇧</span>
+          Please select a counter dropdown above to manage live queues.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // --- Mock Database (Shared Memory mimicking Cloud Firestore) ---
+    const MOCK_COUNTERS = [
+      { businessId: 'biz_hq_001', counterName: 'Billing Counter', activeCounters: 2, averageServiceTime: 4.5 },
+      { businessId: 'biz_hq_001', counterName: 'Technical Support Desk', activeCounters: 1, averageServiceTime: 12.0 },
+      { businessId: 'biz_hq_001', counterName: 'Customer Inquiry & Returns', activeCounters: 3, averageServiceTime: 7.5 },
+      { businessId: 'biz_hq_001', counterName: 'Express Check-In', activeCounters: 4, averageServiceTime: 2.0 },
+      { businessId: 'biz_hq_001', counterName: 'Special Needs Assisting', activeCounters: 0, averageServiceTime: 15.0 }
+    ];
+
+    // Array of tickets: { ticketId, tokenNumber, userId, status ('waiting','serving','completed'), timestamp, counterAssigned }
+    let databaseTickets = [];
+    let tokenSequenceTrackers = {}; // { counterName: currentSeq }
+
+    // User session parameters
+    const currentUserId = 'usr_SHIVANI_DEVICE_ID_101';
+    let selectedCounterIndex = null;
+    let customerSubscribedCounter = null;
+    let adminSubscribedCounter = null;
+
+    // --- Core Logic Implementations ---
+
+    // UI Updates triggers to synchronize left & right panels instantly
+    function notifyDatabaseUpdated() {
+      // Refresh Customer UI if subscribed
+      if (customerSubscribedCounter) {
+        renderCustomerLiveTracker();
+      }
+      // Refresh Admin UI if subscribed
+      if (adminSubscribedCounter) {
+        renderAdminDashboard();
+      }
+      renderCounterList();
+    }
+
+    // Firestore Transaction equivalent: increment sequence and insert ticket
+    function firestoreGenerateNextToken(counterName, userId) {
+      if (!tokenSequenceTrackers[counterName]) {
+        tokenSequenceTrackers[counterName] = 0;
+      }
+      // Step A: Increment
+      tokenSequenceTrackers[counterName] += 1;
+      const tokenNumber = tokenSequenceTrackers[counterName];
+      const ticketId = 'tkt_' + Math.random().toString(36).substr(2, 9);
+      
+      // Step B: Set Model properties
+      const newTicket = {
+        ticketId: ticketId,
+        tokenNumber: tokenNumber,
+        userId: userId,
+        status: 'waiting',
+        timestamp: new Date(),
+        counterAssigned: counterName
+      };
+
+      // Step C: Push write
+      databaseTickets.push(newTicket);
+      notifyDatabaseUpdated();
+      return newTicket;
+    }
+
+    // Firestore state transitions
+    function firestoreUpdateTicketStatus(ticketId, newStatus) {
+      const ticketIndex = databaseTickets.findIndex(t => t.ticketId === ticketId);
+      if (ticketIndex !== -1) {
+        databaseTickets[ticketIndex].status = newStatus;
+        notifyDatabaseUpdated();
+        return true;
+      }
+      return false;
+    }
+
+    // Predictive Analytics Algorithms (Replicated from QueueProvider)
+    function calculatePeopleAhead(userId, counterName) {
+      const activeTickets = databaseTickets.filter(
+        t => t.counterAssigned === counterName && (t.status === 'waiting' || t.status === 'serving')
+      );
+      
+      // Sort ascending by timestamp (FIFO)
+      activeTickets.sort((a, b) => a.timestamp - b.timestamp);
+
+      const userIndex = activeTickets.findIndex(t => t.userId === userId);
+      if (userIndex === -1) return 0;
+
+      const userTicket = activeTickets[userIndex];
+      if (userTicket.status !== 'waiting') return 0;
+
+      // Count waiting tickets ahead
+      let waitingAheadCount = 0;
+      for (let i = 0; i < userIndex; i++) {
+        if (activeTickets[i].status === 'waiting') {
+          waitingAheadCount++;
+        }
+      }
+      return waitingAheadCount;
+    }
+
+    function calculateEstimatedWaitingTime(userId, counterName) {
+      const activeTickets = databaseTickets.filter(
+        t => t.counterAssigned === counterName && (t.status === 'waiting' || t.status === 'serving')
+      );
+      
+      activeTickets.sort((a, b) => a.timestamp - b.timestamp);
+
+      const userIndex = activeTickets.findIndex(t => t.userId === userId);
+      if (userIndex === -1) return 0.0;
+
+      const userTicket = activeTickets[userIndex];
+      if (userTicket.status === 'serving') return 0.0;
+
+      const business = MOCK_COUNTERS.find(c => c.counterName === counterName);
+      if (!business) return 0.0;
+
+      // Division by zero handler
+      if (business.activeCounters <= 0) {
+        return Infinity;
+      }
+
+      const peopleAhead = calculatePeopleAhead(userId, counterName);
+      return (peopleAhead * business.averageServiceTime) / business.activeCounters;
+    }
+
+    // --- UI Presentation Renderers ---
+
+    // Initialize drop-down lists & counter selection lists
+    function init() {
+      // Counter Selector in Admin
+      const adminSelector = document.getElementById('adminCounterSelect');
+      MOCK_COUNTERS.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.counterName;
+        option.innerText = c.counterName;
+        adminSelector.appendChild(option);
+      });
+
+      renderCounterList();
+    }
+
+    function renderCounterList() {
+      const container = document.getElementById('counterOptionsContainer');
+      container.innerHTML = '';
+
+      MOCK_COUNTERS.forEach((c, index) => {
+        const isSelected = selectedCounterIndex === index;
+        const isActive = c.activeCounters > 0;
+
+        // Render card
+        const card = document.createElement('div');
+        card.className = `card card-interactive ${isSelected ? 'card-selected' : ''}`;
+        card.onclick = () => selectCounterCard(index);
+
+        card.innerHTML = `
+          <div class="counter-item">
+            <div class="counter-info">
+              <span class="counter-name">${c.counterName}</span>
+              <span class="counter-meta">
+                <span>Active desks: ${c.activeCounters}</span>
+                <span>Avg time: ${c.averageServiceTime}m</span>
+              </span>
+            </div>
+            <span class="counter-status-badge ${isActive ? 'status-active' : 'status-closed'}">
+              ${isActive ? 'Active' : 'Offline'}
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectCounterCard(index) {
+      selectedCounterIndex = index;
+      document.getElementById('btnGenerateToken').disabled = false;
+      renderCounterList();
+    }
+
+    // Customer Portal: Generate Token Sequence
+    function generateTicket() {
+      const counter = MOCK_COUNTERS[selectedCounterIndex];
+      customerSubscribedCounter = counter.counterName;
+      document.getElementById('custSelectedCounterText').innerText = counter.counterName;
+
+      // Show temporary loading
+      document.getElementById('btnGenerateToken').innerText = 'Generating Ticket...';
+      document.getElementById('btnGenerateToken').disabled = true;
+
+      setTimeout(() => {
+        // Execute atomic generation
+        firestoreGenerateNextToken(counter.counterName, currentUserId);
+        
+        // Router navigation
+        document.getElementById('screenSelection').style.display = 'none';
+        document.getElementById('screenTracker').style.display = 'flex';
+        
+        // Reset button loading
+        document.getElementById('btnGenerateToken').innerText = 'Generate Queue Token';
+        document.getElementById('btnGenerateToken').disabled = false;
+      }, 500);
+    }
+
+    // Customer Portal: Render live metrics
+    function renderCustomerLiveTracker() {
+      if (!customerSubscribedCounter) return;
+
+      const tickets = databaseTickets.filter(
+        t => t.counterAssigned === customerSubscribedCounter && (t.status === 'waiting' || t.status === 'serving')
+      );
+
+      const userTicket = tickets.find(t => t.userId === currentUserId);
+
+      // Handle missing ticket state
+      if (!userTicket) {
+        const completedCount = databaseTickets.filter(
+          t => t.counterAssigned === customerSubscribedCounter && t.userId === currentUserId && t.status === 'completed'
+        ).length;
+
+        if (completedCount > 0) {
+          document.getElementById('screenTracker').style.display = 'none';
+          document.getElementById('screenCompleted').style.display = 'flex';
+        } else {
+          resetCustomerPortal();
+        }
+        return;
+      }
+
+      // 1. Token title & status values
+      document.getElementById('lblUserToken').innerText = `#${userTicket.tokenNumber}`;
+      document.getElementById('lblUserStatus').innerText = userTicket.status.toUpperCase();
+      
+      // Label styling based on status
+      const statusLabel = document.getElementById('lblUserStatus');
+      if (userTicket.status === 'serving') {
+        statusLabel.style.color = 'var(--teal)';
+      } else {
+        statusLabel.style.color = 'var(--orange)';
+      }
+
+      // 2. Now serving info
+      const servingTickets = tickets.filter(t => t.status === 'serving');
+      document.getElementById('lblNowServingCust').innerText = servingTickets.length > 0 
+          ? servingTickets.map(t => '#' + t.tokenNumber).join(', ') 
+          : 'None';
+
+      // 3. AI Predictive Waiting Math
+      const peopleAhead = calculatePeopleAhead(currentUserId, customerSubscribedCounter);
+      const waitTime = calculateEstimatedWaitingTime(currentUserId, customerSubscribedCounter);
+      const isFrozen = waitTime === Infinity;
+
+      document.getElementById('lblPeopleAhead').innerText = peopleAhead;
+      document.getElementById('lblQueuePosition').innerText = userTicket.status === 'serving' ? 'Serving' : (peopleAhead + 1);
+
+      // Render circular wait indicator
+      const progressCircle = document.getElementById('progressCircle');
+      const minutesLabel = document.getElementById('lblWaitMinutes');
+      const unitLabel = document.getElementById('lblWaitUnit');
+      const descriptorLabel = document.getElementById('lblWaitDescriptor');
+      const warningBanner = document.getElementById('frozenQueueBanner');
+
+      if (isFrozen) {
+        warningBanner.style.display = 'flex';
+        minutesLabel.innerText = '--';
+        minutesLabel.style.color = 'var(--orange)';
+        unitLabel.innerText = 'PAUSED';
+        descriptorLabel.innerText = 'Service is temporarily halted. Wait times will recalculate once counters open.';
+        
+        // Progress ring filled orange
+        progressCircle.setAttribute('stroke', 'var(--orange)');
+        setProgressPercent(100);
+      } else {
+        warningBanner.style.display = 'none';
+        minutesLabel.innerText = waitTime.toFixed(0);
+        minutesLabel.style.color = 'var(--text)';
+        unitLabel.innerText = 'MINUTES';
+        descriptorLabel.innerText = 'Calculated dynamically based on real-time activity metrics.';
+
+        // Change color wheel based on urgency
+        if (waitTime > 20) {
+          progressCircle.setAttribute('stroke', 'var(--red)');
+        } else if (waitTime > 10) {
+          progressCircle.setAttribute('stroke', 'var(--orange)');
+        } else {
+          progressCircle.setAttribute('stroke', 'var(--teal)');
+        }
+
+        // Circular progress mapped to a max scale of 40 mins
+        const percentage = Math.min((waitTime / 40) * 100, 100);
+        setProgressPercent(percentage);
+      }
+    }
+
+    // Set SVG progress ring stroke offset
+    function setProgressPercent(percent) {
+      const circle = document.getElementById('progressCircle');
+      const radius = circle.r.baseVal.value;
+      const circumference = radius * 2 * Math.PI;
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    // Customer Portal: Exiting/Cancelling ticket
+    function leaveQueue() {
+      if (confirm('Are you sure you want to cancel your queue ticket and leave the queue?')) {
+        const tickets = databaseTickets.filter(
+          t => t.counterAssigned === customerSubscribedCounter && (t.status === 'waiting' || t.status === 'serving')
+        );
+        const userTicket = tickets.find(t => t.userId === currentUserId);
+        
+        if (userTicket) {
+          firestoreUpdateTicketStatus(userTicket.ticketId, 'completed');
+        }
+      }
+    }
+
+    function resetCustomerPortal() {
+      customerSubscribedCounter = null;
+      selectedCounterIndex = null;
+      document.getElementById('custSelectedCounterText').innerText = 'Not Connected';
+      document.getElementById('btnGenerateToken').disabled = true;
+      
+      document.getElementById('screenCompleted').style.display = 'none';
+      document.getElementById('screenTracker').style.display = 'none';
+      document.getElementById('screenSelection').style.display = 'flex';
+      
+      renderCounterList();
+    }
+
+    // Admin Operations Desk: Change counter subscription
+    function changeAdminCounter(counterName) {
+      adminSubscribedCounter = counterName;
+      
+      document.getElementById('adminSelectionPrompt').style.display = 'none';
+      document.getElementById('adminWorkspace').style.display = 'flex';
+      
+      // Temporary card loading simulation
+      triggerAdminLoader();
+      renderAdminDashboard();
+    }
+
+    // Admin Operations Desk: Render components
+    function renderAdminDashboard() {
+      if (!adminSubscribedCounter) return;
+
+      const tickets = databaseTickets.filter(
+        t => t.counterAssigned === adminSubscribedCounter && (t.status === 'waiting' || t.status === 'serving')
+      );
+
+      // Separate waiting & serving
+      const servingTickets = tickets.filter(t => t.status === 'serving');
+      const waitingTickets = tickets.filter(t => t.status === 'waiting');
+
+      // 1. Serving Monitor Display
+      const monitorToken = document.getElementById('lblAdminServingToken');
+      const monitorUser = document.getElementById('lblAdminServingUser');
+      const badge = document.getElementById('lblActiveSessionBadge');
+
+      if (servingTickets.length > 0) {
+        const currentTicket = servingTickets[0]; // Display oldest active first
+        monitorToken.innerText = `#${currentTicket.tokenNumber}`;
+        monitorToken.style.color = 'var(--teal)';
+        monitorUser.innerText = `User ID: ${currentTicket.userId}`;
+        badge.style.display = 'block';
+        
+        document.getElementById('btnAdminComplete').disabled = false;
+      } else {
+        monitorToken.innerText = '--';
+        monitorToken.style.color = 'var(--text-muted)';
+        monitorUser.innerText = 'Desk Idle - Waiting to call client';
+        badge.style.display = 'none';
+        
+        document.getElementById('btnAdminComplete').disabled = true;
+      }
+
+      // 2. Upcoming queue Grid list
+      document.getElementById('lblAdminQueueCount').innerText = `${waitingTickets.length} Waiting`;
+      const queueList = document.getElementById('adminQueueContainer');
+      queueList.innerHTML = '';
+
+      if (waitingTickets.length > 0) {
+        waitingTickets.forEach((t, index) => {
+          const item = document.createElement('div');
+          item.className = 'queue-admin-item';
+          
+          // Formatted time joined
+          const joinedTime = t.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          item.innerHTML = `
+            <div>
+              <span class="queue-admin-token">#${t.tokenNumber}</span>
+              <span style="font-size: 13px; font-weight: bold; margin-left: 8px;">User ID: ${t.userId}</span>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">${joinedTime}</span>
+          `;
+          queueList.appendChild(item);
+        });
+
+        document.getElementById('btnAdminCall').disabled = false;
+      } else {
+        queueList.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 40px 0;">
+            <p>No clients waiting in line</p>
+            <p style="font-size: 11px; opacity: 0.7;">New tokens will appear here automatically.</p>
+          </div>
+        `;
+        document.getElementById('btnAdminCall').disabled = true;
+      }
+    }
+
+    function triggerAdminLoader() {
+      const loader = document.getElementById('adminLoader');
+      loader.style.display = 'flex';
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 400);
+    }
+
+    // Call Next Client
+    function adminCallNext() {
+      const tickets = databaseTickets.filter(
+        t => t.counterAssigned === adminSubscribedCounter && (t.status === 'waiting' || t.status === 'serving')
+      );
+      const waitingTickets = tickets.filter(t => t.status === 'waiting');
+
+      if (waitingTickets.length === 0) return;
+
+      const nextTicket = waitingTickets[0]; // FIFO oldest
+      
+      triggerAdminLoader();
+      setTimeout(() => {
+        firestoreUpdateTicketStatus(nextTicket.ticketId, 'serving');
+      }, 300);
+    }
+
+    // Complete Current Task
+    function adminCompleteTask() {
+      const tickets = databaseTickets.filter(
+        t => t.counterAssigned === adminSubscribedCounter && (t.status === 'waiting' || t.status === 'serving')
+      );
+      const servingTickets = tickets.filter(t => t.status === 'serving');
+
+      if (servingTickets.length === 0) return;
+
+      const activeTicket = servingTickets[0];
+      
+      triggerAdminLoader();
+      setTimeout(() => {
+        firestoreUpdateTicketStatus(activeTicket.ticketId, 'completed');
+      }, 300);
+    }
+
+    // Bootstrapping
+    window.onload = init;
+  </script>
+
+</body>
+</html>
