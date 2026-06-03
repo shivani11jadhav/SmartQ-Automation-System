@@ -150,4 +150,4 @@ flutter build web --release --web-renderer canvaskit
 firebase deploy --only hosting
 ```
 
-Your hosting URL will be generated (e.g. `https://your-firebase-project-id.web.app`), enabling immediate cross-device tracking testing globally.
+live demo-(https://smartqueueautomation.netlify.app/)
