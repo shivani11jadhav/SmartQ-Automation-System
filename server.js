@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 8080;
-const FILE_PATH = path.join(__dirname, 'web_prototype.html');
+const FILE_PATH = path.join(__dirname, 'index.html');
 
 const server = http.createServer((req, res) => {
   fs.readFile(FILE_PATH, (err, data) => {

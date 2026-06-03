@@ -11,7 +11,7 @@ C:\Users\Fujitsu\.gemini\antigravity\scratch\queue_management_system\
 ├── .firebaserc                # Firebase target configuration
 ├── firebase.json              # Firebase Hosting URL routing rewrites
 ├── server.js                  # Lightweight Node.js preview launcher
-├── web_prototype.html         # Interactive web sandbox dashboard
+├── index.html                 # Interactive web sandbox dashboard
 └── lib/
     ├── main.dart              # Application bootstrapper & Dracula theme
     ├── models/
@@ -37,7 +37,7 @@ If Python or Flutter SDKs are not locally configured in your system environment 
 
 ### Step 1.1: Locate the Sandbox Files
 Navigate to your project root directory containing the simulation bundle:
-* **UI Bundle**: [web_prototype.html](file:///C:/Users/Fujitsu/.gemini/antigravity/scratch/queue_management_system/web_prototype.html)
+* **UI Bundle**: [index.html](file:///C:/Users/Fujitsu/.gemini/antigravity/scratch/queue_management_system/index.html)
 * **Launch Server**: [server.js](file:///C:/Users/Fujitsu/.gemini/antigravity/scratch/queue_management_system/server.js)
 
 ### Step 1.2: Launch the Node.js Server
